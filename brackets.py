@@ -1,5 +1,8 @@
 # por: Pamela Lincoqueo
 from sympy import *
+from matplotlib.pyplot import figure, show
+import matplotlib as mpl
+mpl.rcParams['text.usetex'] = False#usa latex integrado de matplotlib
 x,y,z,t,a,b,c,n,m,p,k = symbols('x y z t a b c n m p k')#define variables incognitas para operar
 
 unaInte = str(input(" Tiene una sola integral? (y/n): "))
@@ -19,14 +22,29 @@ elif unaInte=="n":
 	definida = 0
 
 # ---------------------------------------------------------
-func = input(" Ingrese función: ")
-if unaInte and definida:# funcion con una sola integral definida
-	print("\n Respuesta: ",integrate(func,(x,limInf,limSup)))
+expresion = input(" Ingrese expresión (ejemplo: ((2/x)+3*x)**2): ")
+original = parse_expr(expresion); a = ""
+if unaInte and definida:# función con una sola integral definida
+	sol = integrate(expresion,(x,limInf,limSup))
+	a = "\int_{"+limInf+"}^{"+limSup+"}"
 
-if unaInte and not definida:# funcion con una sola integral no definida
-	print("\n Respuesta: ",integrate(func,x))
+if unaInte and not definida:# función con una sola integral no definida
+	sol = integrate(expresion,x)
+	a = "\int"
 
-if not unaInte:# funcion de varias integrales no definidas
-	for i in range(cInte):
-		func = integrate(func,x)
-	print("\n Respuesta: ",func)
+if not unaInte:# función de varias integrales no definidas
+	sol = integrate(expresion,x)
+	a = a + "\int "
+	for i in range(1,cInte):
+		sol = integrate(sol,x)
+		a = a + "\int "
+
+print("\n Respuesta:",sol)
+
+a = a + latex(original)
+sol = latex(sol)
+
+fig = figure(figsize=(5, 3.5))
+fig.text(0.5,0.5,"Expresión: $%s$\nSolución: $%s$"%(a,sol),ha='center', va='center', size=20)
+fig.canvas.set_window_title('Método de (los no) Brackets')
+show()
